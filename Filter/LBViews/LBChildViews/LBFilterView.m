@@ -243,9 +243,19 @@ typedef void(^LBFilterSureBlock)(NSMutableArray* selectedArray);
 //    LBHouseTypeCell * selectCell = (LBHouseTypeCell *)[collectionView cellForItemAtIndexPath:indexPath];
     LBFilterModel* filterModel = [self.dataSource objectAtIndex:indexPath.section];
     LBFilterListModel* listModel = filterModel.filterList[indexPath.item];
-    listModel.isSelected = !listModel.isSelected;
-    [collectionView reloadItemsAtIndexPaths:[NSArray arrayWithObjects: indexPath, nil]];
-    [self.selectedArray addObject:listModel];
+    if (indexPath.section == 4) {
+        [filterModel.filterList enumerateObjectsUsingBlock:^(id object, NSUInteger idx, BOOL *stop) {
+            LBFilterListModel *listModel = object;
+            listModel.isSelected = indexPath.item == idx?YES:NO;
+            [UIView performWithoutAnimation:^{
+                [collectionView reloadSections:[NSIndexSet indexSetWithIndex:4]];
+            }];
+        }];
+    } else {
+        listModel.isSelected = !listModel.isSelected;
+        [collectionView reloadItemsAtIndexPaths:[NSArray arrayWithObjects: indexPath, nil]];
+        [self.selectedArray addObject:listModel];
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
